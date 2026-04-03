@@ -1,17 +1,11 @@
 import Link from 'next/link'
-import Image from 'next/image'
-import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { getAdminArtists } from '@/lib/data'
 
 export default async function AdminPage() {
-  const supabase = await createClient()
-
-  const { data: artists } = await supabase
-    .from('artists')
-    .select('*, artworks(count)')
-    .order('created_at', { ascending: false })
+  const artists = await getAdminArtists()
 
   return (
     <div>
@@ -22,14 +16,14 @@ export default async function AdminPage() {
         </Link>
       </div>
 
-      {(!artists || artists.length === 0) && (
+      {artists.length === 0 && (
         <p className="text-center text-muted-foreground py-16">
           アーティストがまだ登録されていません
         </p>
       )}
 
       <div className="space-y-3">
-        {artists?.map((artist) => (
+        {artists.map((artist) => (
           <Card key={artist.id}>
             <CardContent className="p-4 flex items-center gap-4">
               <Avatar className="w-12 h-12">
@@ -42,7 +36,7 @@ export default async function AdminPage() {
                   <p className="text-xs text-muted-foreground">{artist.name_en}</p>
                 )}
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  作品数: {(artist.artworks as { count: number }[])?.[0]?.count ?? 0}
+                  作品数: {artist.artworks[0]?.count ?? 0}
                 </p>
               </div>
               <div className="flex gap-2 shrink-0">

@@ -1,29 +1,18 @@
 import { notFound } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
 import { ArtistForm } from '@/components/admin/ArtistForm'
 import { ArtworkManager } from '@/components/admin/ArtworkManager'
 import { Separator } from '@/components/ui/separator'
+import { getAdminArtistDetail } from '@/lib/data'
 
 type Params = { id: string }
 
 export default async function EditArtistPage({ params }: { params: Promise<Params> }) {
   const { id } = await params
-  const supabase = await createClient()
+  const detail = await getAdminArtistDetail(id)
 
-  const { data: artist } = await supabase
-    .from('artists')
-    .select('*')
-    .eq('id', id)
-    .single()
+  if (!detail) notFound()
 
-  if (!artist) notFound()
-
-  const { data: tags } = await supabase.from('tags').select('*').order('name')
-  const { data: artworks } = await supabase
-    .from('artworks')
-    .select('*, tags:artwork_tags(tag:tags(*))')
-    .eq('artist_id', id)
-    .order('created_at', { ascending: false })
+  const { artist, artworks, tags } = detail
 
   return (
     <div>
@@ -35,8 +24,8 @@ export default async function EditArtistPage({ params }: { params: Promise<Param
       <h2 className="text-lg font-bold mb-4">作品管理</h2>
       <ArtworkManager
         artistId={id}
-        artworks={artworks ?? []}
-        tags={tags ?? []}
+        artworks={artworks}
+        tags={tags}
       />
     </div>
   )

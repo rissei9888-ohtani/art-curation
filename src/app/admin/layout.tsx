@@ -1,14 +1,16 @@
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { LogoutButton } from '@/components/admin/LogoutButton'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) redirect('/login')
+  // モック時は認証チェックをスキップ
+  if (process.env.NEXT_PUBLIC_USE_MOCK !== 'true') {
+    const { createClient } = await import('@/lib/supabase/server')
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) redirect('/login')
+  }
 
   return (
     <div className="min-h-screen">

@@ -1,31 +1,21 @@
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import type { Tag } from '@/types'
+import { getArtist, getArtistArtworks } from '@/lib/data'
 
 type Params = { id: string }
 
 export default async function ArtistPage({ params }: { params: Promise<Params> }) {
   const { id } = await params
-  const supabase = await createClient()
-
-  const { data: artist } = await supabase
-    .from('artists')
-    .select('*')
-    .eq('id', id)
-    .single()
+  const [artist, artworks] = await Promise.all([
+    getArtist(id),
+    getArtistArtworks(id),
+  ])
 
   if (!artist) notFound()
-
-  const { data: artworks } = await supabase
-    .from('artworks')
-    .select(`*, tags:artwork_tags(tag:tags(*))`)
-    .eq('artist_id', id)
-    .order('created_at', { ascending: false })
 
   return (
     <main className="max-w-xl mx-auto px-4 py-6">
@@ -82,39 +72,36 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
 
       {/* 作品一覧 */}
       <div className="grid grid-cols-2 gap-3">
-        {artworks?.map((artwork) => {
-          const tags = (artwork.tags as { tag: Tag }[]).map((at) => at.tag)
-          return (
-            <div key={artwork.id} className="space-y-1">
-              <div className="relative aspect-square rounded-lg overflow-hidden bg-muted">
-                <Image
-                  src={artwork.image_url}
-                  alt={artwork.title ?? '作品'}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 50vw, 280px"
-                />
-              </div>
-              {artwork.title && (
-                <p className="text-xs font-medium line-clamp-1">{artwork.title}</p>
-              )}
-              {tags.length > 0 && (
-                <div className="flex flex-wrap gap-1">
-                  {tags.map((tag) => (
-                    <Link key={tag.id} href={`/?tag=${tag.slug}`}>
-                      <Badge variant="secondary" className="text-[10px] py-0 h-4">
-                        #{tag.name}
-                      </Badge>
-                    </Link>
-                  ))}
-                </div>
-              )}
+        {artworks.map((artwork) => (
+          <div key={artwork.id} className="space-y-1">
+            <div className="relative aspect-square rounded-lg overflow-hidden bg-muted">
+              <Image
+                src={artwork.image_url}
+                alt={artwork.title ?? '作品'}
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 50vw, 280px"
+              />
             </div>
-          )
-        })}
+            {artwork.title && (
+              <p className="text-xs font-medium line-clamp-1">{artwork.title}</p>
+            )}
+            {artwork.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {artwork.tags.map((tag) => (
+                  <Link key={tag.id} href={`/?tag=${tag.slug}`}>
+                    <Badge variant="secondary" className="text-[10px] py-0 h-4">
+                      #{tag.name}
+                    </Badge>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
 
-      {(!artworks || artworks.length === 0) && (
+      {artworks.length === 0 && (
         <p className="text-center text-muted-foreground py-12">作品がありません</p>
       )}
     </main>

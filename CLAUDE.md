@@ -42,6 +42,36 @@ supabase/
 └── schema.sql               # DBスキーマ・RLS設定
 ```
 
+## 現在の実装状態（2026-04-03時点）
+
+### 完了済み
+- Next.js 15 + TypeScript + Tailwind CSS v4 + shadcn/ui の初期セットアップ
+- Supabaseクライアント設定（ブラウザ用・サーバー用）
+- 認証ミドルウェア（`/admin` 以下を保護）
+- フィード一覧ページ（タグ絞り込み対応）
+- アーティスト詳細ページ（プロフィール + 作品グリッド）
+- 管理者ログイン / ログアウト
+- アーティスト新規登録・編集フォーム（アバター画像アップロード含む）
+- 作品追加・削除（画像アップロード + タグ紐付け）
+- DBスキーマ + RLS設定（`supabase/schema.sql`）
+- Git初期コミット済み
+- **モックデータによるローカル動作確認対応**（`src/lib/data.ts` + `src/lib/mock-data.ts`）
+- `next/image` 外部ドメイン設定（picsum.photos + Supabase Storage）
+
+### 未着手（次回以降）
+- Supabaseプロジェクトの実際の作成・接続（`.env.local` の値を更新 + `NEXT_PUBLIC_USE_MOCK=false`）
+- 動作確認・デバッグ（Supabase接続後）
+- お気に入り機能の本実装（DBスキーマのみ定義済み）
+- Vercelへのデプロイ
+
+## モック開発モード
+
+`.env.local` の `NEXT_PUBLIC_USE_MOCK=true` でモックデータで動作確認できる。
+- モックデータ: `src/lib/mock-data.ts`（アーティスト3名・作品9点・タグ8種）
+- データアクセス層: `src/lib/data.ts`（モック / Supabase を切り替え）
+- 画像: picsum.photos のプレースホルダーを使用
+- 管理画面の認証チェックもスキップされる（読み取りのみ確認可能）
+
 ## Supabaseセットアップ手順
 
 1. [Supabase](https://supabase.com) でプロジェクトを作成

@@ -13,7 +13,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Trash2 } from 'lucide-react'
 import type { Artwork, Tag } from '@/types'
 
-type ArtworkWithTags = Artwork & { tags: { tag: Tag }[] }
+type ArtworkWithTags = Omit<Artwork, 'tags'> & { tags: { tag: Tag }[] }
 
 type Props = {
   artistId: string
