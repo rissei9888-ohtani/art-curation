@@ -16,7 +16,7 @@ SNSフィード型UIで作品を縦スクロールで閲覧できる。
 | スタイリング | Tailwind CSS v4 |
 | UIコンポーネント | shadcn/ui |
 | バックエンド/DB | Supabase（PostgreSQL + Auth + Storage） |
-| デプロイ先 | Vercel（予定） |
+| デプロイ先 | Vercel（モックモードで稼働中） |
 
 ## ディレクトリ構成
 
@@ -54,15 +54,15 @@ supabase/
 - アーティスト新規登録・編集フォーム（アバター画像アップロード含む）
 - 作品追加・削除（画像アップロード + タグ紐付け）
 - DBスキーマ + RLS設定（`supabase/schema.sql`）
-- Git初期コミット済み
 - **モックデータによるローカル動作確認対応**（`src/lib/data.ts` + `src/lib/mock-data.ts`）
 - `next/image` 外部ドメイン設定（picsum.photos + Supabase Storage）
+- GitHubリポジトリ作成・push（`rissei9888-ohtani/art-curation`）
+- Vercel デプロイ（モックモードで稼働中）
 
 ### 未着手（次回以降）
-- Supabaseプロジェクトの実際の作成・接続（`.env.local` の値を更新 + `NEXT_PUBLIC_USE_MOCK=false`）
+- Supabaseプロジェクトの実際の作成・接続（`.env.local` の値を更新 + Vercel 環境変数を更新して `NEXT_PUBLIC_USE_MOCK` を削除）
 - 動作確認・デバッグ（Supabase接続後）
 - お気に入り機能の本実装（DBスキーマのみ定義済み）
-- Vercelへのデプロイ
 
 ## モック開発モード
 
