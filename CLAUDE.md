@@ -16,7 +16,7 @@ SNSフィード型UIで作品を縦スクロールで閲覧できる。
 | スタイリング | Tailwind CSS v4 |
 | UIコンポーネント | shadcn/ui |
 | バックエンド/DB | Supabase（PostgreSQL + Auth + Storage） |
-| デプロイ先 | Vercel（モックモードで稼働中） |
+| デプロイ先 | Vercel（Supabase 本番接続済み） |
 
 ## ディレクトリ構成
 
@@ -42,7 +42,7 @@ supabase/
 └── schema.sql               # DBスキーマ・RLS設定
 ```
 
-## 現在の実装状態（2026-04-03時点）
+## 現在の実装状態（2026-04-06時点）
 
 ### 完了済み
 - Next.js 15 + TypeScript + Tailwind CSS v4 + shadcn/ui の初期セットアップ
@@ -57,11 +57,10 @@ supabase/
 - **モックデータによるローカル動作確認対応**（`src/lib/data.ts` + `src/lib/mock-data.ts`）
 - `next/image` 外部ドメイン設定（picsum.photos + Supabase Storage）
 - GitHubリポジトリ作成・push（`rissei9888-ohtani/art-curation`）
-- Vercel デプロイ（モックモードで稼働中）
+- Vercel デプロイ・Supabase 本番接続済み
 
 ### 未着手（次回以降）
-- Supabaseプロジェクトの実際の作成・接続（`.env.local` の値を更新 + Vercel 環境変数を更新して `NEXT_PUBLIC_USE_MOCK` を削除）
-- 動作確認・デバッグ（Supabase接続後）
+- 動作確認・デバッグ（ログイン・アーティスト登録・画像アップロード）
 - お気に入り機能の本実装（DBスキーマのみ定義済み）
 
 ## モック開発モード
@@ -72,17 +71,27 @@ supabase/
 - 画像: picsum.photos のプレースホルダーを使用
 - 管理画面の認証チェックもスキップされる（読み取りのみ確認可能）
 
-## Supabaseセットアップ手順
+## Supabase 設定情報
 
-1. [Supabase](https://supabase.com) でプロジェクトを作成
-2. `.env.local` に以下を設定：
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=your-project-url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-   ```
-3. SQL Editorで `supabase/schema.sql` を実行
-4. Storageダッシュボードで `images` バケットを作成（公開設定ON）
-5. Authenticationダッシュボードで管理者ユーザーを作成
+- **Project URL**: `https://ithbwbohycwslkrpfwid.supabase.co`
+- **管理者アカウント**: `n.ohtani@rissei.jp`
+
+### 適用済み設定
+- DBスキーマ（`supabase/schema.sql`）を SQL Editor で実行済み
+- `images` バケット作成済み（公開設定ON）
+- Storage RLS ポリシー設定済み：
+  - `images_public_read`：全ユーザー閲覧可
+  - `images_auth_upload`：認証済みユーザーのみアップロード可
+  - `images_auth_delete`：認証済みユーザーのみ削除可
+
+### 環境変数
+`.env.local`（ローカル）および Vercel の環境変数に以下を設定済み：
+
+| 変数名 | 説明 |
+|--------|------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase プロジェクト URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
+| `NEXT_PUBLIC_USE_MOCK` | `false`（本番接続モード） |
 
 ## 開発サーバー起動
 
